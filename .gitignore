@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+test.ts
+keys/private.pem
+.idea/
+PLAN.md
+CLAUDE.md

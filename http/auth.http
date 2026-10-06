@@ -1,0 +1,55 @@
+### Signup
+POST http://127.0.0.1:3000/signup
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "correct-horse-battery"
+}
+
+### Login
+POST http://127.0.0.1:3000/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "correct-horse-battery"
+}
+
+> {%
+    client.global.set("accessToken", response.body.accessToken);
+    client.global.set("refreshToken", response.body.refreshToken);
+%}
+
+### Me
+GET http://127.0.0.1:3000/me
+Authorization: Bearer {{accessToken}}
+
+### Refresh
+POST http://127.0.0.1:3000/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+> {%
+    client.global.set("accessToken", response.body.accessToken);
+    client.global.set("refreshToken", response.body.refreshTok
+%}
+
+### Logout
+POST http://127.0.0.1:3000/logout
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### Refresh after logout (expect 401)
+POST http://127.0.0.1:3000/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
