@@ -39,3 +39,9 @@ export class InvalidRefreshTokenError extends AppError {
         super("Invalid or expired refresh token",401);
     }
 }
+
+export class RateLimitError extends AppError {
+    constructor(timeWindow: string) {
+        super(`Rate limit exceeded, retry in ${timeWindow}`,429);
+    }
+}

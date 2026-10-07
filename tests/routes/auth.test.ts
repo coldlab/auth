@@ -4,7 +4,7 @@ import { db } from "../../src/db";
 import { usersTable, refreshTokensTable } from "../../src/db/schema";
 import { eq } from "drizzle-orm";
 
-const app = buildApp();
+const app = await buildApp();
 const testEmail = `vitest-${Date.now()}@example.com`;
 const testPassword = "correct-horse-battery";
 

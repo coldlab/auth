@@ -80,9 +80,9 @@ async function logoutHandler(
 
 
 export const authRoutes: FastifyPluginAsync = async (app: FastifyInstance): Promise<void> => {
-    app.post<{Body: SignupBody}>("/signup", { schema: {body: signupSchema} }, signupCheckHandler);
-    app.post<{Body: LoginBody}>("/login", { schema: {body: loginSchema} }, loginHandler);
+    app.post<{Body: SignupBody}>("/signup", { schema: {body: signupSchema}, config: { rateLimit: {max: 10, timeWindow: "1 minute"}} }, signupCheckHandler);
+    app.post<{Body: LoginBody}>("/login", { schema: {body: loginSchema},  config: { rateLimit: {max: 10, timeWindow: "1 minute"}} }, loginHandler);
     app.get('/me', { preHandler: authenticate }, meHandler);
-    app.post<{Body: RefreshBody}>("/refresh", { schema: {body: refreshSchema} }, refreshHandler);
+    app.post<{Body: RefreshBody}>("/refresh", { schema: {body: refreshSchema},  config: { rateLimit: {max: 10, timeWindow: "1 minute"}} }, refreshHandler);
     app.post<{Body: LogoutBody}>("/logout", { schema: {body: logoutSchema} }, logoutHandler);
 }

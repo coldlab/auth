@@ -2,14 +2,42 @@ import Fastify from 'fastify'
 import {logger} from "./core/logger.js";
 import {healthRoutes} from "./routes/health.js";
 import {authRoutes} from "./routes/auth.js";
-import {AppError} from "./core/errors.js";
-import {hasZodFastifySchemaValidationErrors, serializerCompiler, validatorCompiler} from "fastify-type-provider-zod";
+import {AppError, RateLimitError} from "./core/errors.js";
+import {
+    hasZodFastifySchemaValidationErrors,
+    jsonSchemaTransform,
+    serializerCompiler,
+    validatorCompiler
+} from "fastify-type-provider-zod";
+import rateLimit from "@fastify/rate-limit";
+import helmet from "@fastify/helmet"
+import {jwksRoutes} from "./routes/jwks.js";
+import {config} from "./core/config.js";
+import {Environment} from "./core/environments.js";
+import swagger from "@fastify/swagger";
+import swaggerUi from "@fastify/swagger-ui"
 
-export function buildApp() {
+export async function buildApp() {
     const app = Fastify({ loggerInstance: logger });
 
     app.setValidatorCompiler(validatorCompiler);
     app.setSerializerCompiler(serializerCompiler);
+
+    await app.register(rateLimit, {
+        max: 100,
+        timeWindow: "1 minute" ,
+        errorResponseBuilder: (_request, context) =>
+            new RateLimitError(context.after),
+    });
+    await app.register(helmet);
+
+    if (config.environment === Environment.Development) {
+        await app.register(swagger, {
+            openapi: { info: { title: "Auth Service", version: "1.0.0" } },
+            transform: jsonSchemaTransform,
+        });
+        await app.register(swaggerUi, { routePrefix: "/documentation" });
+    }
 
     app.decorateRequest("user", null);
 
@@ -27,6 +55,7 @@ export function buildApp() {
 
     app.register(healthRoutes);
     app.register(authRoutes);
+    app.register(jwksRoutes);
 
     return app;
 }

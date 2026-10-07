@@ -5,6 +5,7 @@ type Config = {
     environment: Environment;
     databaseUrl: string,
     logLevel: string,
+    privateKeyPem: string,
     webServer: {
         port: number,
         host: string,
@@ -33,6 +34,7 @@ function createConfig(): Config {
         environment: env,
         databaseUrl: getEnv('DATABASE_URL'),
         logLevel: logLevel,
+        privateKeyPem: getEnv('PRIVATE_KEY_PEM'),
         webServer: {
             port: port,
             host: getEnv('WEBSERVER_HOST'),
