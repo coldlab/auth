@@ -1,0 +1,9 @@
+# Allowlist: ignore everything, then let through only what the image needs.
+# Keeps .env, keys/private.pem, node_modules, dist etc. out of the build
+# context by default - new files have to be opted in.
+*
+!package.json
+!package-lock.json
+!tsconfig.json
+!src/
+!keys/public.pem

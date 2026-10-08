@@ -1,0 +1,25 @@
+# Builds the auth image and pushes it to Artifact Registry.
+# Run via scripts/build.sh, which sets _TAG to the current commit SHA.
+substitutions:
+  _REGION: europe-west3
+  _REPOSITORY: coldlab-images
+  _IMAGE: auth
+  _TAG: manual # overridden by the build script
+
+options:
+  dynamicSubstitutions: true
+
+steps:
+  - id: build
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --tag=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE}:${_TAG}
+      - --tag=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE}:latest
+      - .
+
+# Pushed after a successful build. Deploys should pin the SHA tag;
+# latest is only a convenience for poking around.
+images:
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE}:${_TAG}
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/${_IMAGE}:latest

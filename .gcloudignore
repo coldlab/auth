@@ -1,0 +1,21 @@
+# What `gcloud builds submit` uploads to Cloud Storage. gcloud does NOT read
+# .dockerignore for this, and without this file it would fall back to
+# .gitignore - so the private key's safety would depend on .gitignore never
+# changing. Explicit allowlist instead: ignore everything, then let through
+# only what the Dockerfile needs. .env and keys/private.pem stay out.
+#
+# Syntax is gitignore's: `*` matches at every depth, so re-including a
+# directory needs both the directory and its contents (`src/` + `src/**`).
+*
+!Dockerfile
+!.dockerignore
+!package.json
+!package-lock.json
+!tsconfig.json
+!src/
+!src/**
+!keys/
+# gcloud treats `!keys/` as re-including the whole folder (unlike git), so
+# exclude its contents again and let only the public key back in.
+keys/*
+!keys/public.pem
