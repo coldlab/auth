@@ -9,6 +9,7 @@
     "start": "node --env-file=.env dist/index.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:migrate:prod": "node --env-file=.env.prod node_modules/drizzle-kit/bin.cjs migrate",
     "db:studio": "drizzle-kit studio",
     "play": "tsx --env-file=.env test.ts",
     "test": "vitest run",
