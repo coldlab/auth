@@ -12,8 +12,10 @@ const publicKeyPem = readFileSync(publicKeyPath, "utf8");
 const privateKey = await importPKCS8(config.privateKeyPem, algorithm);
 const publicKey = await importSPKI(publicKeyPem, algorithm);
 
-export async function signAccessToken(userId: string): Promise<string> {
-    return new SignJWT({ sub: userId })
+// The email rides along so apps can show who did something without asking
+// this service - it's only as fresh as the token (15 min).
+export async function signAccessToken(user: { id: string; email: string }): Promise<string> {
+    return new SignJWT({ sub: user.id, email: user.email })
         .setProtectedHeader({ alg: algorithm })
         .setIssuedAt()
         .setExpirationTime(expirationTime)

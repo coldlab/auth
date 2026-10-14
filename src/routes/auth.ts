@@ -1,6 +1,6 @@
 import type {FastifyInstance, FastifyPluginAsync, FastifyReply, FastifyRequest} from "fastify";
 import {createUser, findUserByEmail, findUserById} from "../service/users.js";
-import {InvalidCredentialsError} from "../core/errors.js";
+import {InvalidCredentialsError, InvalidRefreshTokenError} from "../core/errors.js";
 import {hashPassword, verifyPassword} from "../auth/password.js";
 import {signAccessToken} from "../auth/jwt.js";
 import {authenticate} from "../auth/middleware.js";
@@ -37,7 +37,7 @@ async function loginHandler(
         throw new InvalidCredentialsError();
     }
 
-    const accessToken = await signAccessToken(user.id);
+    const accessToken = await signAccessToken(user);
     const refreshToken = await issueRefreshToken(user.id);
     return reply.code(200).send({ accessToken, refreshToken });
 }
@@ -61,7 +61,13 @@ async function refreshHandler(
     const { refreshToken } = request.body;
 
     const { userId, refreshToken: newRefreshToken } = await rotateRefreshToken(refreshToken)
-    const accessToken = await signAccessToken(userId)
+
+    // The refresh token only knows the user id; the access token needs the email too.
+    const user = await findUserById(userId);
+    if (!user) {
+        throw new InvalidRefreshTokenError();
+    }
+    const accessToken = await signAccessToken(user)
 
     return reply.code(200).send({ accessToken, refreshToken: newRefreshToken });
 
